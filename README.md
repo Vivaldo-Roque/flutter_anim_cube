@@ -1,6 +1,7 @@
 # flutter_anim_cube
 
 Plugin for Hosting native Android views in your Flutter app with Platform Views
+Plugin used ==> [AnimCubeAndroid](https://github.com/cjurjiu/AnimCubeAndroid)
 
 ## ScreenShots
 
