@@ -1,15 +1,9 @@
-# anim_cube
+# flutter_anim_cube
 
-A new Flutter project.
+Plugin for Hosting native Android views in your Flutter app with Platform Views
+Plugin used ==> [AnimCubeAndroid](https://github.com/cjurjiu/AnimCubeAndroid)
 
-## Getting Started
+## ScreenShots
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Screenshot](https://github.com/Vivaldo-Roque/flutter_anim_cube/blob/fc40bc6d2df6304f79e828dd238b7acc7e2d5231/Screenshot_1630233774.png?raw=true)
 
