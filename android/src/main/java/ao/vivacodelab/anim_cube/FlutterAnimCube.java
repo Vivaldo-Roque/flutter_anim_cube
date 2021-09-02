@@ -1,25 +1,51 @@
 package ao.vivacodelab.anim_cube;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.catalinjurjiu.animcubeandroid.AnimCube;
-import io.flutter.Log;
+
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import static io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformView;
 
-public class FlutterAnimCube implements PlatformView, MethodCallHandler, AnimCube.OnCubeModelUpdatedListener, AnimCube.OnCubeAnimationFinishedListener  {
+import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import static io.flutter.plugin.common.MethodChannel.Result;
+
+public class FlutterAnimCube extends AppCompatActivity implements PlatformView, MethodCallHandler, AnimCube.OnCubeModelUpdatedListener, AnimCube.OnCubeAnimationFinishedListener  {
+    public static final String ANIM_CUBE_SAVE_STATE_BUNDLE_ID = "animCube";
     private static final String TAG = "AnimCube";
     private final AnimCube animCube;
     private Bundle state = new Bundle();
     private final MethodChannel methodChannel;
     private int[] scheme;
+    private boolean isSolved = false;
+    private int[][] whiteFace = {
+
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {2, 2, 2, 2, 2, 2, 2, 2, 2},
+            {3, 3, 3, 3, 3, 3, 3, 3, 3},
+            {4, 4, 4, 4, 4, 4, 4, 4, 4},
+            {5, 5, 5, 5, 5, 5, 5, 5, 5},
+
+    };
+
+    private int[][] yellowFace = {
+
+            {1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {2, 2, 2, 2, 2, 2, 2, 2, 2},
+            {3, 3, 3, 3, 3, 3, 3, 3, 3},
+            {5, 5, 5, 5, 5, 5, 5, 5, 5},
+            {4, 4, 4, 4, 4, 4, 4, 4, 4},
+
+    };
 
     FlutterAnimCube(Context context, BinaryMessenger messenger, int id) {
 
@@ -54,6 +80,9 @@ public class FlutterAnimCube implements PlatformView, MethodCallHandler, AnimCub
             case "animateMove":
                 animateMove(result);
                 break;
+            case "applyMoveSequence":
+                applyMoveSequence(result);
+                break;
             case "animateMoveReversed":
                 animateMoveReversed(result);
                 break;
@@ -66,8 +95,17 @@ public class FlutterAnimCube implements PlatformView, MethodCallHandler, AnimCub
             case "setCubeColors":
                 setCubeColors(methodCall, result);
                 break;
+            case "setYellowFace":
+                setYellowFace(result);
+                break;
+            case "setWhiteFace":
+                setWhiteFace(result);
+                break;
             case "applyMoveSequenceReversed":
                 applyMoveSequenceReversed(result);
+                break;
+            case "resetToInitialState":
+                resetToInitialState(result);
                 break;
             default:
                 result.notImplemented();
@@ -88,6 +126,11 @@ public class FlutterAnimCube implements PlatformView, MethodCallHandler, AnimCub
     private void restoreState(Result result){
         animCube.restoreState(state);
         state = animCube.saveState();
+        result.success(null);
+    }
+
+    private void resetToInitialState(Result result){
+        animCube.resetToInitialState();
         result.success(null);
     }
 
@@ -117,19 +160,56 @@ public class FlutterAnimCube implements PlatformView, MethodCallHandler, AnimCub
         result.success(null);
     }
 
+    private void applyMoveSequence(Result result) {
+        animCube.applyMoveSequence();
+        result.success(null);
+    }
+
     private void animateMoveReversed(Result result) {
         animCube.animateMoveReversed();
         result.success(null);
     }
 
+    private void setYellowFace(Result result) {
+        animCube.setCubeModel(yellowFace);
+        result.success(null);
+    }
+
+    private void setWhiteFace(Result result) {
+        animCube.setCubeModel(whiteFace);
+        result.success(null);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Log.d(TAG, "onSaveInstanceState ");
+        outState.putBundle(ANIM_CUBE_SAVE_STATE_BUNDLE_ID, animCube.saveState());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //Log.d(TAG, "onRestoreInstanceState");
+        animCube.restoreState(savedInstanceState.getBundle(ANIM_CUBE_SAVE_STATE_BUNDLE_ID));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //Log.d(TAG, "onDestroy");
+        animCube.cleanUpResources();
+        //Log.d(TAG, "onDestroy: finish");
+    }
+
     @Override
     public void onCubeModelUpdate(int[][] newCubeModel) {
         //Log.d(TAG, "Cube model updated!");
-        printCubeModel(newCubeModel);
+        //printCubeModel(newCubeModel);
     }
 
     void printCubeModel(int[][] cube) {
-        //Log.d(TAG, "Cube model:");
+        Log.d(TAG, "Cube model:");
         StringBuilder stringBuilder = new StringBuilder("");
         for (int i = 0; i < cube.length; i++) {
             stringBuilder.append("\n");
@@ -145,7 +225,7 @@ public class FlutterAnimCube implements PlatformView, MethodCallHandler, AnimCub
                 }
             }
         }
-        //Log.d(TAG, stringBuilder.toString());
+        Log.d(TAG, stringBuilder.toString());
     }
 
     @Override

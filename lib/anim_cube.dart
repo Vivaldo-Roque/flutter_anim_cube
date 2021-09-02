@@ -6,11 +6,11 @@ import 'package:flutter/services.dart';
 typedef void AnimCubeCreatedCallback(AnimCubeController controller);
 
 class AnimCube extends StatefulWidget {
+
   const AnimCube({
     Key? key,
     required this.onAnimCubeCreated,
   }) : super(key: key);
-
   final AnimCubeCreatedCallback onAnimCubeCreated;
 
   @override
@@ -23,59 +23,74 @@ class _AnimCubeState extends State<AnimCube> {
 
   @override
   Widget build(BuildContext context) {
+    Size sizeOfScreen = MediaQuery.of(context).size;
     if (defaultTargetPlatform == TargetPlatform.android) {
       return Container(
-        width: 350,
+        width: sizeOfScreen.width,
         child: Column(
           children: [
             Container(
-              height: 350,
-              width: 350,
+              width: sizeOfScreen.width,
+              height: sizeOfScreen.width,
               child: AndroidView(
                 viewType: 'plugins.vivacodelab.ao/animcube',
                 onPlatformViewCreated: _onPlatformViewCreated,
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    myAnimCubeController.animateMoveReversed();
-                  },
-                  child: RotatedBox(
-                      quarterTurns: 2,
-                      child: Icon(
-                        Icons.forward,
-                        size: 50,
-                      )),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    myAnimCubeController.animateMoveSequence();
-                  },
-                  child: Icon(
-                    Icons.play_arrow,
-                    size: 50,
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      myAnimCubeController.animateMoveReversed();
+                    },
+                    child: RotatedBox(
+                        quarterTurns: 2,
+                        child: Icon(
+                          Icons.forward,
+                        )),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    myAnimCubeController.stopAnimation();
-                  },
-                  child: Icon(
-                    Icons.stop,
-                    size: 50,
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async{
+                      myAnimCubeController.animateMoveSequence();
+                    },
+                    child: Icon(
+                      Icons.play_arrow,
+                    ),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    myAnimCubeController.animateMove();
-                  },
-                  child: Icon(
-                    Icons.forward,
-                    size: 50,
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      myAnimCubeController.resetToInitialState();
+                      myAnimCubeController.applyMoveSequenceReversed();
+                    },
+                    child: Icon(
+                      Icons.replay,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      myAnimCubeController.stopAnimation();
+                    },
+                    child: Icon(
+                      Icons.stop,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      myAnimCubeController.animateMove();
+                    },
+                    child: Icon(
+                      Icons.forward,
+                    ),
                   ),
                 ),
               ],
@@ -139,5 +154,21 @@ class AnimCubeController {
 
   Future<void> animateMoveReversed() async {
     return _channel.invokeMethod('animateMoveReversed');
+  }
+
+  Future<void> applyMoveSequence() async {
+    return _channel.invokeMethod('applyMoveSequence');
+  }
+
+  Future<void> resetToInitialState() async {
+    return _channel.invokeMethod('resetToInitialState');
+  }
+
+  Future<void> setYellowFace() async {
+    return _channel.invokeMethod('setYellowFace');
+  }
+
+  Future<void> setWhiteFace() async {
+    return _channel.invokeMethod('setWhiteFace');
   }
 }

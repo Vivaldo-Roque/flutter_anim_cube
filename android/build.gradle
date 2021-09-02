@@ -30,9 +30,9 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':animcubeandroid')
-    implementation 'org.jetbrains:annotations-java5:15.0'
+    //implementation 'org.jetbrains:annotations-java5:22.0.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    //implementation 'com.google.android.material:material:1.4.0'
+    //implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    implementation project(path: ':animcubeandroid')
 }
